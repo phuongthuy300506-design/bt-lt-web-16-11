@@ -38,15 +38,6 @@
             font-size: 16px;
             border-radius: 8px;
         }
-        .hint-badge {
-            background: #fef3c7;
-            border: 1px dashed #d97706;
-            color: #92400e;
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-size: 13px;
-            margin-top: 15px;
-        }
     </style>
 </head>
 <body>
@@ -107,14 +98,6 @@
                 Quay lại Đăng nhập
             </a>
         </div>
-
-        <c:if test="${not empty otpHint}">
-            <div class="hint-badge">
-                <i class="fa-solid fa-key me-1"></i><strong>Mã OTP vừa gửi:</strong> 
-                <span class="fs-6 fw-bold text-danger ms-1">${otpHint}</span>
-                <div class="text-muted" style="font-size: 11px;">(Được hiển thị trực quan để test trên môi trường Localhost)</div>
-            </div>
-        </c:if>
     </form>
 </div>
 

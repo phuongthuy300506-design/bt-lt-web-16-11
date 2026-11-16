@@ -27,12 +27,6 @@ public class ResetPasswordController extends HttpServlet {
         }
         req.setAttribute("email", email);
 
-        String hint = (String) req.getSession().getAttribute("otp_hint");
-        if (hint == null && email != null) {
-            hint = EmailUtil.getLatestOtp(email);
-        }
-        req.setAttribute("otpHint", hint);
-
         req.getRequestDispatcher("/views/reset-password.jsp").forward(req, resp);
     }
 
@@ -66,13 +60,11 @@ public class ResetPasswordController extends HttpServlet {
         if (success) {
             HttpSession session = req.getSession();
             session.removeAttribute("forgot_email");
-            session.removeAttribute("otp_hint");
             session.setAttribute("success_msg", "Đặt lại mật khẩu thành công! Vui lòng đăng nhập với mật khẩu mới.");
             resp.sendRedirect(req.getContextPath() + "/login");
         } else {
             req.setAttribute("alert", "Mã xác thực OTP không chính xác hoặc đã hết hạn!");
             req.setAttribute("email", email);
-            req.setAttribute("otpHint", req.getSession().getAttribute("otp_hint"));
             req.getRequestDispatcher("/views/reset-password.jsp").forward(req, resp);
         }
     }

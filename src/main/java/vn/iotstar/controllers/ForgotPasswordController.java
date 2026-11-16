@@ -50,9 +50,7 @@ public class ForgotPasswordController extends HttpServlet {
         // Gửi mã xác nhận OTP qua email
         boolean sent = userService.sendForgotPasswordOtp(user.getEmail());
         if (sent) {
-            String otp = EmailUtil.getLatestOtp(user.getEmail());
             req.getSession().setAttribute("forgot_email", user.getEmail());
-            req.getSession().setAttribute("otp_hint", otp);
             resp.sendRedirect(req.getContextPath() + "/reset-password?email=" + user.getEmail());
         } else {
             req.setAttribute("alert", "Không thể gửi mã xác nhận OTP. Vui lòng thử lại sau!");

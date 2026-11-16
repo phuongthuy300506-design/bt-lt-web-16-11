@@ -69,10 +69,8 @@ public class RegisterController extends HttpServlet {
 
         boolean success = userService.register(user);
         if (success) {
-            String testOtp = EmailUtil.getLatestOtp(email);
             req.getSession().setAttribute("verify_username", username);
             req.getSession().setAttribute("verify_email", email);
-            req.getSession().setAttribute("otp_hint", testOtp);
             resp.sendRedirect(req.getContextPath() + "/verify-otp?username=" + username);
         } else {
             req.setAttribute("alert", "Có lỗi xảy ra trong quá trình đăng ký. Vui lòng thử lại!");

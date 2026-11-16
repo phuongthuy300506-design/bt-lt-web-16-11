@@ -27,13 +27,6 @@ public class VerifyOtpController extends HttpServlet {
         }
         req.setAttribute("username", username);
 
-        // Hỗ trợ hiển thị gợi ý OTP để test nhanh
-        String hint = (String) req.getSession().getAttribute("otp_hint");
-        if (hint == null && username != null) {
-            hint = EmailUtil.getLatestOtp(username);
-        }
-        req.setAttribute("otpHint", hint);
-
         req.getRequestDispatcher("/views/verify-otp.jsp").forward(req, resp);
     }
 
@@ -57,13 +50,11 @@ public class VerifyOtpController extends HttpServlet {
             HttpSession session = req.getSession();
             session.removeAttribute("verify_username");
             session.removeAttribute("verify_email");
-            session.removeAttribute("otp_hint");
             session.setAttribute("success_msg", "Kích hoạt tài khoản thành công! Hãy đăng nhập để trải nghiệm.");
             resp.sendRedirect(req.getContextPath() + "/login");
         } else {
             req.setAttribute("alert", "Mã OTP không chính xác hoặc đã hết hiệu lực. Vui lòng kiểm tra lại!");
             req.setAttribute("username", username);
-            req.setAttribute("otpHint", req.getSession().getAttribute("otp_hint"));
             req.getRequestDispatcher("/views/verify-otp.jsp").forward(req, resp);
         }
     }

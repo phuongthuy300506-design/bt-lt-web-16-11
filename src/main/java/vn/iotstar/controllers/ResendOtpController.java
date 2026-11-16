@@ -30,8 +30,6 @@ public class ResendOtpController extends HttpServlet {
             }
             if (user != null) {
                 userService.sendOtpForActivation(username.trim());
-                String newOtp = EmailUtil.getLatestOtp(user.getEmail());
-                req.getSession().setAttribute("otp_hint", newOtp);
                 req.getSession().setAttribute("verify_username", user.getUsername());
                 resp.sendRedirect(req.getContextPath() + "/verify-otp?username=" + user.getUsername() + "&resent=true");
                 return;
