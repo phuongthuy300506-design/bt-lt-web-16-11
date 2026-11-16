@@ -82,7 +82,9 @@
             <label class="form-label fw-semibold text-secondary">Mã xác nhận OTP (6 chữ số) <span class="text-danger">*</span></label>
             <div class="input-group">
                 <span class="input-group-text bg-light"><i class="fa-solid fa-shield-halved text-muted"></i></span>
-                <input type="text" name="otp" class="form-control fw-bold text-primary" maxlength="6" placeholder="Nhập 6 số OTP" required autofocus>
+                <input type="text" name="otp" class="form-control fw-bold text-primary" maxlength="6" 
+                       value="${not empty autoOtp ? autoOtp : ''}"
+                       placeholder="Nhập 6 số OTP" required autofocus>
             </div>
         </div>
 

@@ -114,6 +114,7 @@
 
         <div class="mb-4">
             <input type="text" name="otp" class="form-control otp-input" maxlength="6" 
+                   value="${not empty autoOtp ? autoOtp : ''}"
                    placeholder="------" required autofocus autocomplete="off">
         </div>
 
