@@ -26,6 +26,9 @@ public class ResetPasswordController extends HttpServlet {
             email = (String) req.getSession().getAttribute("forgot_email");
         }
         req.setAttribute("email", email);
+        boolean mailConfigured = vn.iotstar.util.Constant.SENDER_APP_PASSWORD != null 
+                && !vn.iotstar.util.Constant.SENDER_APP_PASSWORD.trim().isEmpty();
+        req.setAttribute("mailConfigured", mailConfigured);
 
         req.getRequestDispatcher("/views/reset-password.jsp").forward(req, resp);
     }

@@ -26,6 +26,9 @@ public class VerifyOtpController extends HttpServlet {
             username = (String) req.getSession().getAttribute("verify_username");
         }
         req.setAttribute("username", username);
+        boolean mailConfigured = vn.iotstar.util.Constant.SENDER_APP_PASSWORD != null 
+                && !vn.iotstar.util.Constant.SENDER_APP_PASSWORD.trim().isEmpty();
+        req.setAttribute("mailConfigured", mailConfigured);
 
         req.getRequestDispatcher("/views/verify-otp.jsp").forward(req, resp);
     }
@@ -55,6 +58,9 @@ public class VerifyOtpController extends HttpServlet {
         } else {
             req.setAttribute("alert", "Mã OTP không chính xác hoặc đã hết hiệu lực. Vui lòng kiểm tra lại!");
             req.setAttribute("username", username);
+            boolean mailConfigured = vn.iotstar.util.Constant.SENDER_APP_PASSWORD != null 
+                    && !vn.iotstar.util.Constant.SENDER_APP_PASSWORD.trim().isEmpty();
+            req.setAttribute("mailConfigured", mailConfigured);
             req.getRequestDispatcher("/views/verify-otp.jsp").forward(req, resp);
         }
     }

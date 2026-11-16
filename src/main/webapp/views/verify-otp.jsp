@@ -85,7 +85,14 @@
     <c:if test="${param.resent == 'true'}">
         <div class="alert alert-info py-2 px-3 small text-start d-flex align-items-center mb-3">
             <i class="fa-solid fa-check me-2 fs-5"></i>
-            <div>Đã gửi lại mã OTP mới qua email!</div>
+            <div>Đã gửi lại mã OTP mới!</div>
+        </div>
+    </c:if>
+
+    <c:if test="${not mailConfigured}">
+        <div class="alert alert-warning py-2 px-3 small text-start d-flex align-items-center mb-3" style="background: #fffbeb; border: 1px solid #fef3c7; color: #92400e;">
+            <i class="fa-solid fa-circle-info me-2 fs-5 text-warning"></i>
+            <div>Chưa cấu hình Mật khẩu ứng dụng Gmail trong <strong>Constant.java</strong>. Mã OTP đã được in tại cửa sổ <strong>Tomcat Console</strong>!</div>
         </div>
     </c:if>
 
