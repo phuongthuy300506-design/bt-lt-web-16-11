@@ -9,6 +9,7 @@
     <persistence-unit name="jpa-hibernate-mysql" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
 
+        <class>vn.iotstar.entity.User</class>
         <class>vn.iotstar.entity.Category</class>
         <class>vn.iotstar.entity.Video</class>
 
@@ -30,6 +31,7 @@
     <persistence-unit name="jpa-hibernate-h2" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
 
+        <class>vn.iotstar.entity.User</class>
         <class>vn.iotstar.entity.Category</class>
         <class>vn.iotstar.entity.Video</class>
 

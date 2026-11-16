@@ -1,7 +1,7 @@
 @echo off
-title Khoi dong Tomcat 11 - CRUD Category JPA HCMUTE
+title Khoi dong Tomcat 11 - HCMUTE Web Video & OTP Authentication
 echo ========================================================
-echo       KHOI DONG TOMCAT 11 - CRUD CATEGORY JPA
+echo       KHOI DONG TOMCAT 11 - HCMUTE WEB VIDEO & OTP
 echo ========================================================
 set "JAVA_HOME=C:\Program Files\Java\jdk-21"
 set "CATALINA_HOME=D:\lt web\apache-tomcat-11.0.27-windows-x64\apache-tomcat-11.0.27"
@@ -37,9 +37,9 @@ set /a count=0
 :WAIT_LOOP
 timeout /t 2 /nobreak >nul
 set /a count+=2
-curl.exe -s -o nul "http://localhost:8080/admin/categories"
+curl.exe -s -o nul "http://localhost:8080/home"
 if %errorlevel% equ 0 goto READY
-if %count% geq 20 goto READY
+if %count% geq 25 goto READY
 echo    Dang khoi dong... (%count%s)
 goto WAIT_LOOP
 
@@ -47,8 +47,11 @@ goto WAIT_LOOP
 echo.
 echo ========================================================
 echo [THANH CONG] He thong da hoan tat va san sang!
-echo URL: http://localhost:8080/admin/categories
+echo URL Trang Chu:      http://localhost:8080/home
+echo URL Video:          http://localhost:8080/video
+echo URL Dang Nhap:      http://localhost:8080/login
+echo URL Admin Videos:   http://localhost:8080/admin/videos
+echo URL Admin Category: http://localhost:8080/admin/categories
 echo ========================================================
-start http://localhost:8080/admin/categories
+start http://localhost:8080/home
 pause
-

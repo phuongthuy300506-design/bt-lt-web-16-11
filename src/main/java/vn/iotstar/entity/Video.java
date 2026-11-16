@@ -10,19 +10,19 @@ import jakarta.persistence.NamedQuery;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "Videos")
+@Table(name = "videos")
 @NamedQuery(name = "Video.findAll", query = "SELECT v FROM Video v")
 public class Video implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @Column(name = "VideoId")
+    @Column(name = "VideoId", length = 50)
     private String videoId;
 
     @Column(name = "Active")
-    private int active;
+    private int active = 1;
 
-    @Column(name = "Description", columnDefinition = "nvarchar(500) null")
+    @Column(name = "Description", columnDefinition = "nvarchar(max) null")
     private String description;
 
     @Column(name = "Poster", columnDefinition = "nvarchar(500) null")
@@ -32,24 +32,35 @@ public class Video implements Serializable {
     private String title;
 
     @Column(name = "Views")
-    private int views;
+    private int views = 0;
+
+    @Column(name = "VideoUrl", columnDefinition = "nvarchar(500) null")
+    private String videoUrl;
 
     // bi-directional many-to-one association to Category
     @ManyToOne
     @JoinColumn(name = "CategoryId")
     private Category category;
 
+    // bi-directional many-to-one association to User (Yeu cau 4: Moi quan he 1-n voi bang users)
+    @ManyToOne
+    @JoinColumn(name = "UserId")
+    private User user;
+
     public Video() {
     }
 
-    public Video(String videoId, int active, String description, String poster, String title, int views, Category category) {
+    public Video(String videoId, int active, String description, String poster, String title, int views,
+            String videoUrl, Category category, User user) {
         this.videoId = videoId;
         this.active = active;
         this.description = description;
         this.poster = poster;
         this.title = title;
         this.views = views;
+        this.videoUrl = videoUrl;
         this.category = category;
+        this.user = user;
     }
 
     public String getVideoId() {
@@ -104,6 +115,14 @@ public class Video implements Serializable {
         this.views = views;
     }
 
+    public String getVideoUrl() {
+        return this.videoUrl;
+    }
+
+    public void setVideoUrl(String videoUrl) {
+        this.videoUrl = videoUrl;
+    }
+
     public Category getCategory() {
         return this.category;
     }
@@ -120,9 +139,16 @@ public class Video implements Serializable {
         this.category = category;
     }
 
+    public User getUser() {
+        return this.user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
     @Override
     public String toString() {
         return "Video [videoId=" + videoId + ", title=" + title + ", active=" + active + ", views=" + views + "]";
     }
 }
-
