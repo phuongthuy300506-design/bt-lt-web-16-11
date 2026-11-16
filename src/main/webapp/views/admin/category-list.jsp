@@ -27,9 +27,32 @@
 </head>
 <body>
 
+<div style="background: #212529; color: white; padding: 12px 20px; border-radius: 6px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center;">
+    <div>
+        <a href="<c:url value='/home'/>" style="color: #0dcaf0; text-decoration: none; font-weight: bold; margin-right: 20px;"> Trang Chủ (/home)</a>
+        <a href="<c:url value='/video'/>" style="color: #ffc107; text-decoration: none; font-weight: bold; margin-right: 20px;"> Video Của Tôi (/video)</a>
+        <a href="<c:url value='/admin/videos'/>" style="color: #dc3545; text-decoration: none; font-weight: bold; margin-right: 20px;"> Quản lý Videos (/admin/videos)</a>
+        <a href="<c:url value='/admin/categories'/>" style="color: #fff; text-decoration: none; font-weight: bold; text-decoration: underline;"> Quản lý Category</a>
+    </div>
+    <div>
+        <c:choose>
+            <c:when test="${not empty sessionScope.account}">
+                <span style="color: #adb5bd; margin-right: 15px;">Xin chào, <strong>${sessionScope.account.fullName != null ? sessionScope.account.fullName : sessionScope.account.username}</strong></span>
+                <a href="<c:url value='/logout'/>" style="color: #ff6b6b; text-decoration: none; font-weight: bold;">Đăng xuất</a>
+            </c:when>
+            <c:otherwise>
+                <a href="<c:url value='/login'/>" style="color: #0dcaf0; text-decoration: none; font-weight: bold; margin-right: 15px;">Đăng nhập</a>
+                <a href="<c:url value='/register'/>" style="color: #28a745; text-decoration: none; font-weight: bold;">Đăng ký</a>
+            </c:otherwise>
+        </c:choose>
+    </div>
+</div>
+
 <h2>DANH SÁCH CATEGORY (QUẢN LÝ BẰNG JPA)</h2>
-<a class="btn-add" href="<c:url value='/admin/category/add'/>">+ Add Category</a>
-<br>
+<div style="margin-bottom: 15px; display: flex; gap: 10px;">
+    <a class="btn-add" href="<c:url value='/admin/category/add'/>">+ Add Category</a>
+    <a class="btn-add" style="background-color: #0d6efd;" href="<c:url value='/admin/videos'/>"> Chuyển đến Quản lý Videos</a>
+</div>
 
 <table>
     <tr>
