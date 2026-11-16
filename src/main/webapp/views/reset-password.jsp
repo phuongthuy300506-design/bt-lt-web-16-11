@@ -49,19 +49,6 @@
         <small class="text-muted">Nhập mã OTP đã nhận qua email và mật khẩu mới</small>
     </div>
 
-    <c:if test="${not empty smtpError}">
-        <div class="alert alert-warning py-2 px-3 small d-flex align-items-center mb-3" style="background: #fffbeb; border: 1px solid #fef3c7; color: #92400e;">
-            <i class="fa-solid fa-triangle-exclamation me-2 fs-5 text-warning"></i>
-            <div>${smtpError}</div>
-        </div>
-    </c:if>
-    <c:if test="${empty smtpError and not mailConfigured}">
-        <div class="alert alert-warning py-2 px-3 small d-flex align-items-center mb-3" style="background: #fffbeb; border: 1px solid #fef3c7; color: #92400e;">
-            <i class="fa-solid fa-circle-info me-2 fs-5 text-warning"></i>
-            <div>Chưa cấu hình Mật khẩu ứng dụng Gmail trong <strong>Constant.java</strong>. Mã OTP đã được in tại cửa sổ <strong>Tomcat Console</strong>!</div>
-        </div>
-    </c:if>
-
     <c:if test="${not empty alert}">
         <div class="alert alert-danger py-2 px-3 small d-flex align-items-center mb-3">
             <i class="fa-solid fa-triangle-exclamation me-2 fs-5"></i>
