@@ -50,13 +50,6 @@
             border-radius: 8px;
             transition: all 0.3s;
         }
-        .demo-box {
-            background: #f1f5f9;
-            border-left: 4px solid #0d6efd;
-            padding: 12px;
-            border-radius: 6px;
-            font-size: 13px;
-        }
     </style>
 </head>
 <body>
@@ -125,12 +118,6 @@
             <a href="${pageContext.request.contextPath}/register" class="text-decoration-none fw-semibold text-primary">
                 Đăng ký ngay
             </a>
-        </div>
-
-        <div class="demo-box mt-3">
-            <span class="fw-bold text-dark"><i class="fa-solid fa-circle-info me-1 text-primary"></i>Tài khoản mẫu:</span>
-            <div class="mt-1">Admin: <code>admin</code> / <code>1234@a$</code></div>
-            <div>User: <code>user</code> / <code>1234@a$</code></div>
         </div>
     </form>
 </div>
