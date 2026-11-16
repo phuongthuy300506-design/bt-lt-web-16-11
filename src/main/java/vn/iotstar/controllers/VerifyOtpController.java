@@ -29,6 +29,7 @@ public class VerifyOtpController extends HttpServlet {
         boolean mailConfigured = vn.iotstar.util.Constant.SENDER_APP_PASSWORD != null 
                 && !vn.iotstar.util.Constant.SENDER_APP_PASSWORD.trim().isEmpty();
         req.setAttribute("mailConfigured", mailConfigured);
+        req.setAttribute("smtpError", vn.iotstar.util.EmailUtil.lastSendError);
 
         req.getRequestDispatcher("/views/verify-otp.jsp").forward(req, resp);
     }
@@ -61,6 +62,7 @@ public class VerifyOtpController extends HttpServlet {
             boolean mailConfigured = vn.iotstar.util.Constant.SENDER_APP_PASSWORD != null 
                     && !vn.iotstar.util.Constant.SENDER_APP_PASSWORD.trim().isEmpty();
             req.setAttribute("mailConfigured", mailConfigured);
+            req.setAttribute("smtpError", vn.iotstar.util.EmailUtil.lastSendError);
             req.getRequestDispatcher("/views/verify-otp.jsp").forward(req, resp);
         }
     }
