@@ -182,17 +182,18 @@
                     <div class="col">
                         <div class="video-card">
                             <div class="thumb-wrapper">
-                                <img src="${pageContext.request.contextPath}/image?fname=${v.poster}" 
-                                     alt="${v.title}" 
-                                     onerror="this.src='https://picsum.photos/seed/${v.videoId}/400/225'">
+                                <a href="${pageContext.request.contextPath}/video/detail?id=${v.videoId}" style="display: block; width: 100%; height: 100%;">
+                                    <img src="${pageContext.request.contextPath}/image?fname=${v.poster}" 
+                                         alt="${v.title}">
 
-                                <span class="badge-views">
-                                    <i class="fa-solid fa-eye me-1"></i>${v.views} lượt xem
-                                </span>
+                                    <span class="badge-views">
+                                        <i class="fa-solid fa-eye me-1"></i>${v.views} lượt xem
+                                    </span>
 
-                                <!-- Yêu cầu 4.4: Click play overlay -->
-                                <a href="${pageContext.request.contextPath}/video/detail?id=${v.videoId}" class="play-overlay">
-                                    <i class="fa-solid fa-play"></i>
+                                    <!-- Play overlay -->
+                                    <span class="play-overlay">
+                                        <i class="fa-solid fa-play"></i>
+                                    </span>
                                 </a>
                             </div>
 

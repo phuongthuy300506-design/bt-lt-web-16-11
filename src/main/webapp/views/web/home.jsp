@@ -190,24 +190,25 @@
             <div class="col">
                 <div class="video-card">
                     <div class="thumb-wrapper">
-                        <!-- Poster thumbnail -->
-                        <img src="${pageContext.request.contextPath}/image?fname=${v.poster}" 
-                             alt="${v.title}" 
-                             onerror="this.src='https://picsum.photos/seed/${v.videoId}/400/225'">
-                        
-                        <!-- Lượt xem -->
-                        <span class="badge-views">
-                            <i class="fa-solid fa-eye me-1"></i>${v.views}
-                        </span>
+                        <a href="${pageContext.request.contextPath}/video/detail?id=${v.videoId}" style="display: block; width: 100%; height: 100%;">
+                            <!-- Poster thumbnail -->
+                            <img src="${pageContext.request.contextPath}/image?fname=${v.poster}" 
+                                 alt="${v.title}">
+                            
+                            <!-- Lượt xem -->
+                            <span class="badge-views">
+                                <i class="fa-solid fa-eye me-1"></i>${v.views}
+                            </span>
 
-                        <!-- Danh mục -->
-                        <c:if test="${not empty v.category}">
-                            <span class="badge-category">${v.category.categoryname}</span>
-                        </c:if>
+                            <!-- Danh mục -->
+                            <c:if test="${not empty v.category}">
+                                <span class="badge-category">${v.category.categoryname}</span>
+                            </c:if>
 
-                        <!-- Play icon khi hover -->
-                        <a href="${pageContext.request.contextPath}/video/detail?id=${v.videoId}" class="play-overlay">
-                            <i class="fa-solid fa-play"></i>
+                            <!-- Play icon khi hover -->
+                            <span class="play-overlay">
+                                <i class="fa-solid fa-play"></i>
+                            </span>
                         </a>
                     </div>
 

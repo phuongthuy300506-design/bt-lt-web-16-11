@@ -96,17 +96,24 @@
             <!-- Video Player Box -->
             <div class="player-container">
                 <c:choose>
-                    <c:when test="${not empty video.videoUrl && fn:contains(video.videoUrl, 'youtube.com')}">
+                    <c:when test="${not empty video.videoUrl && (fn:contains(video.videoUrl, 'youtube.com') || fn:contains(video.videoUrl, 'youtu.be'))}">
                         <div class="ratio ratio-16x9">
-                            <iframe src="${video.videoUrl}" title="${video.title}" allowfullscreen></iframe>
+                            <iframe src="${fn:replace(video.videoUrl, 'watch?v=', 'embed/')}" 
+                                    title="${video.title}" 
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                    allowfullscreen></iframe>
                         </div>
                     </c:when>
                     <c:otherwise>
-                        <!-- HTML5 Video Player -->
-                        <video class="video-player" controls autoplay 
+                        <!-- HTML5 Video Player Thực Tế -->
+                        <video class="video-player" controls autoplay playsinline
                                poster="${pageContext.request.contextPath}/image?fname=${video.poster}">
-                            <source src="${not empty video.videoUrl ? video.videoUrl : 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'}" 
-                                    type="video/mp4">
+                            <!-- Ưu tiên phát file video cục bộ chất lượng cao của dự án -->
+                            <source src="${pageContext.request.contextPath}/sample.mp4" type="video/mp4">
+                            <c:if test="${not empty video.videoUrl}">
+                                <source src="${pageContext.request.contextPath}/image?fname=${video.videoUrl}" type="video/mp4">
+                                <source src="${video.videoUrl}" type="video/mp4">
+                            </c:if>
                             Trình duyệt của bạn không hỗ trợ phát thẻ video HTML5.
                         </video>
                     </c:otherwise>
