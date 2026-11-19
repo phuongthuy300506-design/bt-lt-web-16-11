@@ -1,107 +1,139 @@
-# BÁO CÁO BÀI TẬP LẬP TRÌNH WEB (16/11/2026) - HCMUTE
-## TRIỂN KHAI TOÀN DIỆN CÔNG NGHỆ JPA (HIBERNATE ORM 6.6) & XÁC THỰC OTP
-
+# BÁO CÁO BÀI TẬP 03 - LẬP TRÌNH WEB (HCMUTE)
+## SITEMESH DECORATOR 3 (3.3.0) & FORM VALIDATION TOÀN DIỆN
 - **Môn học:** Lập trình Web (`WEBPR330479`)
 - **Khoa:** Công Nghệ Thông Tin - Bộ Môn Công Nghệ Phần Mềm
 - **Trường:** Đại học Sư Phạm Kỹ Thuật TP.HCM (HCMUTE)
 - **Giảng viên hướng dẫn:** ThS. Nguyễn Hữu Trung
-- **Môi trường triển khai:** Java 21 LTS, Jakarta EE 11 (Servlet 6.1, JSP 3.1, JSTL 3.0), Hibernate ORM 6.6.1.Final, Jakarta Mail 2.1.3, Apache Tomcat 11.0.2, SQL Server / H2 Database Fallback.
+- **Sinh viên thực hiện:** Lê Phương Thùy (MSSV: **24110058**)
+- **Môi trường:** Java 21 LTS, Jakarta EE 11, Tomcat 11.0.2, Sitemesh 3.3.0, Bootstrap 5.3.3, Hibernate ORM 6.6.1.
+- **Thời hạn nộp:** Trước 16g00 ngày 19/11/2026.
 
 ---
 
-## 1. Tóm tắt các yêu cầu đã thực hiện đầy đủ 100%
+## TỔNG HỢP CÁC YÊU CẦU BÀI TẬP 03 ĐÃ HOÀN THÀNH 100%
 
-### Yêu cầu 1: Bổ sung chức năng kích hoạt tài khoản bằng OTP được gửi qua email khi đăng ký tài khoản
-- **Quy trình:**
-  1. Người dùng truy cập `/register` và điền thông tin: Tên đăng nhập, Email, Mật khẩu, Họ tên, Số điện thoại.
-  2. Hệ thống kiểm tra trùng lặp `username` và `email`.
-  3. Mật khẩu được mã hóa an toàn bằng thuật toán băm **SHA-256**.
-  4. Hệ thống sinh ngẫu nhiên **mã OTP gồm 6 chữ số** và lưu tài khoản với trạng thái `status = 0` (Chưa kích hoạt) cùng `code = OTP`.
-  5. Gửi mã OTP qua email người dùng bằng **Jakarta Mail** (`jakarta.mail` / `angus-mail`) theo định dạng HTML đẹp mắt.
-  6. Đồng thời in mã OTP ra server console và hiển thị gợi ý trực quan tại giao diện `/verify-otp?username=...` để kiểm thử cục bộ mượt mà không bị nghẽn mạng SMTP.
-  7. Người dùng nhập đúng mã OTP tại `/verify-otp` -> Tài khoản chuyển sang `status = 1` (Đã kích hoạt), xóa mã OTP khỏi hệ thống và chuyển hướng tới `/login`.
-  8. Hỗ trợ chức năng **Gửi lại mã OTP** (`/resend-otp`) khi mã hết hạn.
+### YÊU CẦU 1: Cấu hình Sitemesh Decorator 3 (3.3.0) với Bootstrap Template
+*(Hoàn thành trước 16g00 ngày 19/11/2026)*
 
-### Yêu cầu 2: Thực hiện chức năng đăng nhập với mật khẩu được mã hóa (hash password) & đăng xuất
-- **Đăng nhập (`/login`):**
-  - Mật khẩu người dùng nhập vào được băm SHA-256 qua `PasswordUtil.verify()` và so khớp với chuỗi mã hóa trong Database.
-  - Kiểm tra trạng thái kích hoạt: Nếu tài khoản có `status = 0` (chưa kích hoạt OTP), hệ thống thông báo yêu cầu kích hoạt và chuyển hướng người dùng tới trang nhập mã OTP.
-  - Đăng nhập thành công -> Lưu thông tin phiên làm việc vào `HttpSession` (`account`).
-  - Hỗ trợ lưu Cookie **Ghi nhớ đăng nhập (Remember Me)** với thời hạn 7 ngày.
-  - Phân quyền điều hướng tự động: Admin (`roleid = 1`) -> chuyển về trang Quản trị (`/admin/categories` hoặc `/admin/videos`); User (`roleid = 5`) -> chuyển về Trang chủ (`/home`).
-- **Đăng xuất (`/logout`):**
-  - Hủy session `account`, xóa cookie Remember Me và chuyển hướng an toàn về `/login`.
-
-### Yêu cầu 3: Thực hiện chức năng quên mật khẩu gửi mã xác nhận OTP qua mail
-- **Quy trình:**
-  1. Người dùng vào `/forgot-password`, nhập địa chỉ email đã đăng ký.
-  2. Hệ thống kiểm tra email tồn tại trong database.
-  3. Sinh mã xác nhận OTP 6 số mới, lưu vào trường `code` của User trong database.
-  4. Gửi email thông báo mã OTP đặt lại mật khẩu bằng Jakarta Mail (và ghi log ra console).
-  5. Chuyển hướng sang trang đặt lại mật khẩu `/reset-password?email=...`.
-  6. Người dùng nhập: Email, Mã OTP, Mật khẩu mới, Xác nhận mật khẩu mới.
-  7. Kiểm tra mã OTP khớp -> Mã hóa mật khẩu mới bằng **SHA-256**, cập nhật vào database, xóa trường OTP `code = null`.
-  8. Chuyển hướng về `/login` với thông báo thành công.
-
-### Yêu cầu 4: Thêm bảng Videos vào database với mối liên hệ 1-n với bảng users trước đó
-- **Cơ sở dữ liệu & Entity:**
-  - Bảng `videos` có khóa ngoại `UserId` tham chiếu đến `[User](id)` (Quan hệ 1 - n: Một User có thể đăng nhiều Videos).
-  - Khóa ngoại `CategoryId` tham chiếu đến `categories(CategoryId)`.
-  - Khai báo Entity JPA: `@ManyToOne @JoinColumn(name = "UserId") private User user;` trong `Video.java` và `@OneToMany(mappedBy = "user") private List<Video> videos;` trong `User.java`.
-- **4.1. Thực hiện CRUD cho bảng Videos:**
-  - Danh sách video: `/admin/videos` (Admin) và `/video` (User).
-  - Thêm mới video: `/admin/video/add` / `/video/add` (với Form Multipart).
-  - Chỉnh sửa video: `/admin/video/edit` / `/video/edit`.
-  - Xóa video: `/admin/video/delete` / `/video/delete`.
-- **4.2. Hiển thị 10 video mới nhất lên trang chủ (`/home`):**
-  - Truy vấn JPA: `SELECT v FROM Video v WHERE v.active = 1 ORDER BY v.videoId DESC` giới hạn `setMaxResults(10)`.
-  - Hiển thị lưới thẻ Responsive bằng Bootstrap 5 kèm Thumbnail Poster, số lượt xem (views), tên người đăng (Uploader), danh mục.
-- **4.3. Hiển thị tất cả videos của user phân trang 6sp/trang trên URL `/video`:**
-  - Servlet `UserVideoController` ánh xạ URL `/video`.
-  - Khi User đăng nhập: lọc danh sách video của chính User đó và phân trang **6 video/trang**.
-  - Tính toán số trang: `totalPages = ceil(total / 6)`.
-  - Giao diện có thanh điều hướng phân trang đầy đủ: Nút *Trước*, các số trang *1, 2, 3...*, Nút *Sau*.
-- **4.4. Hiển thị chi tiết và play 01 video khi bấm chuột vào tiêu đề trên `/home` và `/video`:**
-  - Tiêu đề của mọi video trên `/home` và `/video` là liên kết dẫn tới `/video/detail?id=...`.
-  - Servlet `VideoDetailController` tự động tăng số lượt xem: `views = views + 1`.
-  - Trang `/video/detail` tích hợp trình phát video HTML5 Player / YouTube Responsive, hiển thị tiêu đề, lượt xem, mô tả, người đăng, danh mục và cột danh sách video gợi ý liên quan bên cạnh.
-- **4.5. Hướng dẫn upload file bằng Multipart:**
-  - Áp dụng cấu hình chuẩn theo tài liệu `10_UploadFile_servlet_jakarta.pdf`:
-    - `@MultipartConfig(fileSizeThreshold = 2MB, maxFileSize = 50MB, maxRequestSize = 100MB)`.
-    - Trích xuất tên file upload bằng hàm `getFileName(Part part)`.
-    - Lưu file vào thư mục `Constant.UPLOAD_DIRECTORY` (`D:\upload`) và phục vụ ảnh/video qua `DownloadImageController` (`/image?fname=...`).
-
----
-
-## 2. Danh mục URL và Tài khoản Test
-
-### Tài khoản có sẵn:
-| Tài khoản (Username) | Mật khẩu gốc | Mật khẩu băm SHA-256 lưu DB | Phân quyền | Trạng thái OTP |
-|----------------------|--------------|------------------------------|------------|----------------|
-| `admin`              | `1234@a$`    | `fbd2a48be520754d37ebadb968d0909b91c468c99d27bbdc03d3a1df115235a9` | Admin (1) | Đã kích hoạt (1) |
-| `manager`            | `1234@a$`    | `fbd2a48be520754d37ebadb968d0909b91c468c99d27bbdc03d3a1df115235a9` | Manager (2)| Đã kích hoạt (1) |
-| `user`               | `1234@a$`    | `fbd2a48be520754d37ebadb968d0909b91c468c99d27bbdc03d3a1df115235a9` | User (5)   | Đã kích hoạt (1) |
-
-### Danh sách URL chính:
-- **Trang chủ (10 Video mới nhất):** `http://localhost:8080/home`
-- **Trang Video người dùng (Phân trang 6sp/trang):** `http://localhost:8080/video`
-- **Trang Đăng nhập:** `http://localhost:8080/login`
-- **Trang Đăng ký (Xác thực OTP):** `http://localhost:8080/register`
-- **Trang Quên mật khẩu:** `http://localhost:8080/forgot-password`
-- **Trang Quản trị Videos (Admin CRUD):** `http://localhost:8080/admin/videos`
-- **Trang Quản trị Danh mục (Category):** `http://localhost:8080/admin/categories`
-
----
-
-## 3. Cách chạy dự án
-
-1. **Chạy nhanh bằng 1-Click:**
-   - Nhấp đúp vào file `CHAY WEB.bat` tại thư mục gốc của dự án.
-   - File BAT sẽ tự động build Maven, deploy WAR vào Tomcat 11 và mở trình duyệt tại `http://localhost:8080/home`.
-
-2. **Chạy kiểm thử tự động (Unit Test Runner):**
-   - Mở terminal tại thư mục dự án và chạy:
-     ```powershell
-     $env:JAVA_HOME = "C:\Program Files\Java\jdk-21"; D:\apache-maven-3.9.9\bin\mvn.cmd compile exec:java "-Dexec.mainClass=vn.iotstar.config.TestFullHomework"
+1. **Dependency Sitemesh 3:**
+   - Cấu hình trong `pom.xml`:
+     ```xml
+     <dependency>
+         <groupId>org.sitemesh</groupId>
+         <artifactId>sitemesh-webfilter</artifactId>
+         <version>3.3.0</version>
+     </dependency>
      ```
-   - Kiểm thử toàn bộ 4 yêu cầu tự động và in kết quả chi tiết.
+
+2. **Cấu hình `web.xml`:**
+   - Đăng ký filter Sitemesh hỗ trợ đầy đủ cả `REQUEST` và `FORWARD` trên Tomcat 11:
+     ```xml
+     <filter>
+         <filter-name>sitemesh</filter-name>
+         <filter-class>vn.iotstar.filter.CustomSiteMeshFilter</filter-class>
+     </filter>
+     <filter-mapping>
+         <filter-name>sitemesh</filter-name>
+         <url-pattern>/*</url-pattern>
+         <dispatcher>REQUEST</dispatcher>
+         <dispatcher>FORWARD</dispatcher>
+     </filter-mapping>
+     ```
+
+3. **Cấu hình `sitemesh3.xml` trong `WEB-INF`:**
+   - Phân chia giao diện cho người dùng và quản trị viên:
+     ```xml
+     <sitemesh>
+         <mapping path="/admin/*" name="admin" decorator="admin.jsp" />
+         <mapping path="/views/admin/*" name="admin" decorator="admin.jsp" />
+         <mapping path="/*" name="web" decorator="web.jsp" />
+         <mapping path="/api*" exclude="true" />
+         <mapping path="*.mp4" exclude="true" />
+         <mapping path="*.css" exclude="true" />
+         <mapping path="*.js" exclude="true" />
+         <mapping path="*.png" exclude="true" />
+         <mapping path="*.jpg" exclude="true" />
+     </sitemesh>
+     ```
+
+4. **Cấu trúc thư mục trong `webapp` chuẩn 100% theo slide:**
+   ```text
+   webapp/
+   ├── common/
+   │   ├── admin/
+   │   │   ├── footer.jsp
+   │   │   ├── header.jsp
+   │   │   └── left.jsp
+   │   ├── web/
+   │   │   ├── footer.jsp
+   │   │   ├── header.jsp
+   │   │   ├── left.jsp
+   │   │   ├── navbar.jsp
+   │   │   └── topbar.jsp
+   │   ├── info.jsp
+   │   └── taglib.jsp
+   ├── info.jsp
+   ├── taglib.jsp
+   ├── templates/
+   ├── uploads/
+   ├── views/
+   └── WEB-INF/
+       ├── decorators/
+       │   ├── admin.jsp
+       │   ├── login.jsp
+       │   └── web.jsp
+       ├── beans.xml
+       ├── sitemesh3.xml
+       └── web.xml
+   ```
+
+5. **Xây dựng Template Layout:**
+   - `web.jsp`: Layout người dùng dùng Bootstrap 5, Dark theme, Navbar tìm kiếm, Topbar hiển thị tài khoản, Slider video, Sidebar lọc danh mục, Footer.
+   - `admin.jsp`: Layout quản trị viên với Sidebar chức năng, Header quản trị, Bảng danh mục & video.
+
+---
+
+### YÊU CẦU 2: Thực hiện Validation cho các chức năng có FORM
+*(Hoàn thành trước 16g00 ngày 19/11/2026)*
+
+Xây dựng bộ kiểm tra dữ liệu đầu vào [FormValidator.java](src/main/java/vn/iotstar/util/FormValidator.java) kết hợp giao diện Bootstrap 5 (`is-invalid`, `invalid-feedback`, alert cảnh báo) và giữ lại dữ liệu đã nhập (`sticky form`):
+
+1. **Form Đăng nhập (`/login`):**
+   - Kiểm tra để trống Tên đăng nhập và Mật khẩu.
+   - Kiểm tra định dạng độ dài mật khẩu tối thiểu 6 ký tự.
+   - Xác thực mật khẩu băm SHA-256 khớp CSDL, kiểm tra tài khoản đã kích hoạt OTP.
+
+2. **Form Đăng ký (`/register`):**
+   - **Tên đăng nhập:** 4–30 ký tự, chỉ chứa chữ, số, gạch dưới; kiểm tra không trùng lặp trong CSDL.
+   - **Họ và tên:** Tối thiểu 2 ký tự, không được để trống.
+   - **Email:** Định dạng RFC regex chuẩn; kiểm tra không trùng lặp email.
+   - **Số điện thoại:** Định dạng chuẩn 10 số di động Việt Nam.
+   - **Mật khẩu & Nhập lại mật khẩu:** Tối thiểu 6 ký tự, 2 ô mật khẩu bắt buộc phải trùng khớp nhau.
+   - Sau khi đăng ký thành công -> Gửi OTP và **tự động điền mã OTP** tại `/verify-otp` để thuận tiện kiểm thử trực tiếp.
+
+3. **Form Quên mật khẩu (`/forgot-password` & `/reset-password`):**
+   - Kiểm tra tài khoản và email có tồn tại và khớp với nhau trong CSDL.
+   - Tự động điền mã OTP tại `/reset-password`, kiểm tra mật khẩu mới và xác nhận mật khẩu mới khớp nhau.
+
+4. **Form Quản lý Danh mục (Insert & Edit Category):**
+   - Đường dẫn: `/admin/category/add` và `/admin/category/edit`.
+   - Kiểm tra tên danh mục bắt buộc nhập, độ dài từ 2–100 ký tự.
+   - Giữ lại hình ảnh cũ khi chỉnh sửa nếu không tải file mới.
+
+5. **Form Quản lý Video (Insert & Edit Video):**
+   - Đường dẫn: `/admin/video/add` và `/admin/video/edit`.
+   - **Mã Video:** 2–20 ký tự, chỉ gồm chữ cái, số, gạch ngang/dưới. Khi thêm mới kiểm tra không trùng mã video đã có.
+   - **Tiêu đề:** Tối thiểu 5 ký tự.
+   - **Danh mục:** Bắt buộc chọn danh mục cha hợp lệ.
+   - **Poster & Video:** Bắt buộc có poster và file video hoặc link video.
+
+---
+
+### LỊCH SỬ COMMIT QUÁ TRÌNH LÀM BÀI TRÊN GITHUB
+- `ad729b5`: *fix*
+- `b96aeb5`: *Bo sung info.jsp va taglib.jsp tai goc webapp dong bo 100% theo slide*
+- `42731cf`: *Bat lai tinh nang tu dong dien ma OTP tren giao dien de tien test*
+- `9d92678`: *Fix Sitemesh 3 decoration dispatching on Tomcat 11 for forwarded controller routes*
+- `5755431`: *Bo sung thu muc templates va file beans.xml dong bo cau truc thu muc Sitemesh theo slide*
+- `78b06b9`: **Bai tap 03 - Yeu cau 2: Trien khai Form Validation cho Login, Register, Forgot Password, Insert va Edit (Category va Video)**
+- `408344a`: **Bai tap 03 - Yeu cau 1: Cau hinh Sitemesh Decorator 3 (3.3.0) voi Bootstrap Template dung chung toan bo website**
