@@ -62,24 +62,54 @@
             <div class="d-flex align-items-center">
                 <c:choose>
                     <c:when test="${sessionScope.account != null}">
-                        <div class="dropdown">
-                            <button class="btn btn-outline-light btn-sm dropdown-toggle d-flex align-items-center" type="button" data-bs-toggle="dropdown">
+                        <div class="dropdown position-relative" id="userDropdownContainer">
+                            <button class="btn btn-outline-light btn-sm dropdown-toggle d-flex align-items-center" 
+                                    type="button" 
+                                    id="userDropdownBtn" 
+                                    data-bs-toggle="dropdown" 
+                                    aria-expanded="false"
+                                    onclick="toggleUserDropdown(event)">
                                 <i class="fa-solid fa-circle-user fs-5 text-info me-2"></i>
                                 <span>${sessionScope.account.fullName != null ? sessionScope.account.fullName : sessionScope.account.username}</span>
                                 <c:if test="${sessionScope.account.roleid == 1}">
                                     <span class="badge bg-danger ms-2" style="font-size: 10px;">Admin</span>
                                 </c:if>
                             </button>
-                            <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark shadow">
-                                <li><h6 class="dropdown-header text-secondary">Tài khoản: @${sessionScope.account.username}</h6></li>
-                                <li><a class="dropdown-item" href="${pageContext.request.contextPath}/video"><i class="fa-solid fa-folder-open me-2"></i>Video của tôi</a></li>
+                            <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark shadow py-2" 
+                                id="userDropdownMenu"
+                                aria-labelledby="userDropdownBtn"
+                                style="min-width: 220px; z-index: 99999;">
+                                <li class="px-3 py-2 border-bottom border-secondary mb-1">
+                                    <div class="fw-bold text-white">${sessionScope.account.fullName != null ? sessionScope.account.fullName : sessionScope.account.username}</div>
+                                    <small class="text-secondary">@${sessionScope.account.username}</small>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item py-2" href="${pageContext.request.contextPath}/video">
+                                        <i class="fa-solid fa-folder-open me-2 text-info"></i>Video của tôi
+                                    </a>
+                                </li>
                                 <c:if test="${sessionScope.account.roleid == 1}">
-                                    <li><a class="dropdown-item text-warning" href="${pageContext.request.contextPath}/admin/categories"><i class="fa-solid fa-gear me-2"></i>Bảng quản trị</a></li>
+                                    <li>
+                                        <a class="dropdown-item py-2 text-warning" href="${pageContext.request.contextPath}/admin/categories">
+                                            <i class="fa-solid fa-gear me-2"></i>Bảng quản trị Admin
+                                        </a>
+                                    </li>
                                 </c:if>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item text-danger" href="${pageContext.request.contextPath}/logout"><i class="fa-solid fa-arrow-right-from-bracket me-2"></i>Đăng xuất</a></li>
+                                <li><hr class="dropdown-divider border-secondary my-1"></li>
+                                <li>
+                                    <a class="dropdown-item py-2 text-danger fw-semibold d-flex align-items-center" 
+                                       href="${pageContext.request.contextPath}/logout">
+                                        <i class="fa-solid fa-arrow-right-from-bracket me-2 fs-6"></i>Đăng xuất
+                                    </a>
+                                </li>
                             </ul>
                         </div>
+                        <!-- Nút Đăng xuất trực tiếp cạnh avatar/tên -->
+                        <a href="${pageContext.request.contextPath}/logout" 
+                           class="btn btn-outline-danger btn-sm ms-2 d-flex align-items-center" 
+                           title="Đăng xuất khỏi hệ thống">
+                            <i class="fa-solid fa-arrow-right-from-bracket me-1"></i>Đăng xuất
+                        </a>
                     </c:when>
                     <c:otherwise>
                         <div class="d-flex gap-2">
@@ -96,3 +126,64 @@
         </div>
     </div>
 </nav>
+
+<style>
+#userDropdownContainer {
+    position: relative !important;
+}
+#userDropdownMenu.show {
+    display: block !important;
+    position: absolute !important;
+    top: 100% !important;
+    right: 0 !important;
+    left: auto !important;
+    margin-top: 6px !important;
+    background-color: #1e293b !important;
+    border: 1px solid #475569 !important;
+    border-radius: 8px !important;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5) !important;
+    z-index: 99999 !important;
+}
+#userDropdownMenu .dropdown-item {
+    color: #cbd5e1;
+    transition: all 0.2s;
+}
+#userDropdownMenu .dropdown-item:hover {
+    background-color: #334155;
+    color: #ffffff;
+}
+#userDropdownMenu .dropdown-item.text-danger:hover {
+    background-color: #dc3545;
+    color: #ffffff !important;
+}
+</style>
+
+<script>
+function toggleUserDropdown(e) {
+    if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    var menu = document.getElementById('userDropdownMenu');
+    var btn = document.getElementById('userDropdownBtn');
+    if (menu) {
+        if (menu.classList.contains('show')) {
+            menu.classList.remove('show');
+            if (btn) btn.setAttribute('aria-expanded', 'false');
+        } else {
+            menu.classList.add('show');
+            if (btn) btn.setAttribute('aria-expanded', 'true');
+        }
+    }
+}
+
+document.addEventListener('click', function(e) {
+    var container = document.getElementById('userDropdownContainer');
+    var menu = document.getElementById('userDropdownMenu');
+    var btn = document.getElementById('userDropdownBtn');
+    if (container && menu && !container.contains(e.target)) {
+        menu.classList.remove('show');
+        if (btn) btn.setAttribute('aria-expanded', 'false');
+    }
+});
+</script>
