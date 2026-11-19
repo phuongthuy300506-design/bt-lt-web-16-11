@@ -8,6 +8,6 @@ public class Constant {
     public static final String SESSION_ACCOUNT = "account";
 
     // Cấu hình tài khoản gửi Email qua Google SMTP (Gmail)
-    public static final String SENDER_EMAIL = "24110058@student.hcmute.edu.vn";
-    public static final String SENDER_APP_PASSWORD = "Lephuongthui3566&&";
+    public static final String SENDER_EMAIL = "phuongthuy300506@gmail.com";
+    public static final String SENDER_APP_PASSWORD = "lephuongthuy300506@&";
 }
