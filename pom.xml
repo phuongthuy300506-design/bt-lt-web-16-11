@@ -109,6 +109,13 @@
             <artifactId>angus-mail</artifactId>
             <version>2.0.3</version>
         </dependency>
+
+        <!-- Sitemesh Decorator 3 (3.3.0) for Jakarta EE 11 / Servlet 6.1 (Bài tập 03 - Yêu cầu 1) -->
+        <dependency>
+            <groupId>org.sitemesh</groupId>
+            <artifactId>sitemesh-webfilter</artifactId>
+            <version>3.3.0</version>
+        </dependency>
     </dependencies>
 
     <build>

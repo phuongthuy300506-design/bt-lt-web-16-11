@@ -32,9 +32,7 @@
 </head>
 <body>
 
-<jsp:include page="/views/common/topbar.jsp" />
-
-<div class="container py-4">
+<div class="container-fluid py-2">
     <div class="admin-card">
         <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-3 border-bottom">
             <div>

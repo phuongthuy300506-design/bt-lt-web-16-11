@@ -123,9 +123,6 @@
 </head>
 <body>
 
-<!-- Thanh điều hướng Topbar -->
-<jsp:include page="/views/common/topbar.jsp" />
-
 <div class="container py-4 mb-5">
     <!-- Header trang Video -->
     <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-3 border-bottom border-secondary">

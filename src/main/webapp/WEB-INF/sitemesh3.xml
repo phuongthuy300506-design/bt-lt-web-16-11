@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sitemesh>
+    <!-- ============================================================== -->
+    <!-- Bước 3: Cấu hình SiteMesh 3 - Bài tập 03 (ThS. Nguyễn Hữu Trung) -->
+    <!-- Phân chia giao diện cho người dùng và admin                     -->
+    <!-- ============================================================== -->
+    <mapping path="/*" name="web" decorator="web.jsp" />
+    <mapping path="/admin/*" name="admin" decorator="admin.jsp" />
+
+    <!-- Exclude path from decoration. -->
+    <mapping path="/api*" exclude="true" />
+    <mapping path="/image*" exclude="true" />
+    <mapping path="/uploads/*" exclude="true" />
+    <mapping path="*.mp4" exclude="true" />
+    <mapping path="*.css" exclude="true" />
+    <mapping path="*.js" exclude="true" />
+    <mapping path="*.png" exclude="true" />
+    <mapping path="*.jpg" exclude="true" />
+    <mapping path="*.jpeg" exclude="true" />
+    <mapping path="*.webp" exclude="true" />
+    <mapping path="*.gif" exclude="true" />
+    <mapping path="*.ico" exclude="true" />
+</sitemesh>

@@ -145,9 +145,6 @@
 </head>
 <body>
 
-<!-- Thanh điều hướng Topbar -->
-<jsp:include page="/views/common/topbar.jsp" />
-
 <!-- Hero Banner -->
 <section class="hero-banner">
     <div class="container text-center">
@@ -248,14 +245,6 @@
     </div>
 
 </div>
-
-<!-- Footer -->
-<footer class="bg-dark text-secondary py-4 border-top border-secondary">
-    <div class="container text-center small">
-        <p class="mb-1 text-light fw-bold">TRƯỜNG ĐẠI HỌC SƯ PHẠM KỸ THUẬT TP.HCM (HCMUTE)</p>
-        <p class="mb-0">Môn học: Lập trình Web (WEBPR330479) - Bài tập 16/11/2026</p>
-    </div>
-</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>

@@ -86,9 +86,6 @@
 </head>
 <body>
 
-<!-- Thanh điều hướng Topbar -->
-<jsp:include page="/views/common/topbar.jsp" />
-
 <div class="container py-4 mb-5">
     <div class="row">
         <!-- Cột Trái: Trình phát Video (Player) & Thông tin chi tiết (Yêu cầu 4.4) -->
