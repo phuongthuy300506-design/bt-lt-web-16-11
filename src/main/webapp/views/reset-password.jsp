@@ -70,7 +70,7 @@
             <div class="input-group">
                 <span class="input-group-text bg-light"><i class="fa-solid fa-shield-halved text-muted"></i></span>
                 <input type="text" name="otp" class="form-control fw-bold text-primary" maxlength="6" 
-                       value="${not empty autoOtp ? autoOtp : ''}"
+                       value=""
                        placeholder="Nhập 6 số OTP" required autofocus>
             </div>
         </div>

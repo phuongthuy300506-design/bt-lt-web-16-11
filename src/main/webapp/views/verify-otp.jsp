@@ -101,8 +101,8 @@
 
         <div class="mb-4">
             <input type="text" name="otp" class="form-control otp-input" maxlength="6" 
-                   value="${not empty autoOtp ? autoOtp : ''}"
-                   placeholder="------" required autofocus autocomplete="off">
+                   value=""
+                   placeholder="Nhập 6 số OTP" required autofocus autocomplete="off">
         </div>
 
         <button type="submit" class="btn btn-primary w-100 btn-submit mb-3">
