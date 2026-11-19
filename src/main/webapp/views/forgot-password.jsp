@@ -6,20 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quên Mật Khẩu - HCMUTE Video</title>
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        body {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            padding: 20px;
-        }
         .forgot-card {
             background: #ffffff;
             border-radius: 16px;
@@ -27,6 +14,7 @@
             width: 100%;
             max-width: 440px;
             padding: 35px 30px;
+            margin: 40px auto;
         }
         .forgot-icon {
             width: 65px;
@@ -71,12 +59,22 @@
         </div>
     </c:if>
 
-    <form action="${pageContext.request.contextPath}/forgot-password" method="post" class="text-start">
+    <form action="${pageContext.request.contextPath}/forgot-password" method="post" class="text-start needs-validation" novalidate>
+        <!-- Email Validation -->
         <div class="mb-3">
-            <label class="form-label fw-semibold text-secondary">Địa chỉ Email đăng ký</label>
+            <label class="form-label fw-semibold text-secondary">Địa chỉ Email đăng ký <span class="text-danger">*</span></label>
             <div class="input-group">
                 <span class="input-group-text bg-light"><i class="fa-solid fa-envelope text-muted"></i></span>
-                <input type="email" name="email" class="form-control" placeholder="Ví dụ: your_email@gmail.com" required autofocus>
+                <input type="email" name="email" class="form-control ${not empty errorEmail ? 'is-invalid' : ''}" 
+                       placeholder="Ví dụ: your_email@gmail.com" value="${email}" required autofocus>
+                <c:if test="${not empty errorEmail}">
+                    <div class="invalid-feedback d-block">
+                        <i class="fa-solid fa-circle-exclamation me-1"></i>${errorEmail}
+                    </div>
+                </c:if>
+                <div class="invalid-feedback">
+                    Vui lòng nhập địa chỉ email hợp lệ.
+                </div>
             </div>
         </div>
 
@@ -92,6 +90,5 @@
     </form>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

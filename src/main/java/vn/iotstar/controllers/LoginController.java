@@ -12,6 +12,7 @@ import vn.iotstar.entity.User;
 import vn.iotstar.services.IUserService;
 import vn.iotstar.services.impl.UserServiceImpl;
 import vn.iotstar.util.Constant;
+import vn.iotstar.util.FormValidator;
 
 @WebServlet(urlPatterns = "/login")
 public class LoginController extends HttpServlet {
@@ -58,8 +59,25 @@ public class LoginController extends HttpServlet {
         String password = req.getParameter("password");
         String remember = req.getParameter("remember");
 
-        if (username == null || username.trim().isEmpty() || password == null || password.trim().isEmpty()) {
-            req.setAttribute("alert", "Tài khoản hoặc mật khẩu không được rỗng!");
+        boolean hasError = false;
+
+        // Triển khai Server-side Form Validation (Yêu cầu 2)
+        if (FormValidator.isNullOrBlank(username)) {
+            req.setAttribute("errorUsername", "Vui lòng nhập tên đăng nhập hoặc email!");
+            hasError = true;
+        }
+
+        if (FormValidator.isNullOrBlank(password)) {
+            req.setAttribute("errorPassword", "Vui lòng nhập mật khẩu!");
+            hasError = true;
+        } else if (!FormValidator.isValidPassword(password)) {
+            req.setAttribute("errorPassword", "Mật khẩu phải có tối thiểu 6 ký tự!");
+            hasError = true;
+        }
+
+        if (hasError) {
+            req.setAttribute("username", username);
+            req.setAttribute("alert", "Vui lòng kiểm tra lại thông tin đăng nhập!");
             req.getRequestDispatcher("/views/login.jsp").forward(req, resp);
             return;
         }
@@ -76,9 +94,8 @@ public class LoginController extends HttpServlet {
             return;
         }
 
-        // 2. Yêu cầu 1: Kiểm tra trạng thái kích hoạt tài khoản bằng OTP
+        // 2. Kiểm tra trạng thái kích hoạt tài khoản bằng OTP
         if (user.getStatus() == 0) {
-            // Chưa kích hoạt tài khoản
             req.getSession().setAttribute("verify_username", user.getUsername());
             req.getSession().setAttribute("verify_email", user.getEmail());
             userService.sendOtpForActivation(user.getUsername());
@@ -103,7 +120,7 @@ public class LoginController extends HttpServlet {
             resp.addCookie(cookie);
         }
 
-        // 5. Điều hướng theo phân quyền: Admin -> /admin/categories, User -> /home
+        // Điều hướng: Admin vào quản trị, User vào trang chủ
         if (user.getRoleid() == 1) {
             resp.sendRedirect(req.getContextPath() + "/admin/categories");
         } else {

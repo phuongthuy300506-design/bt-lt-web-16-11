@@ -2,72 +2,135 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Cập nhật Category - JPA Hibernate</title>
+    <title>Cập Nhật Danh Mục #${cate.categoryid} - Admin HCMUTE</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 30px; background-color: #f8f9fa; }
-        .form-container { max-width: 500px; background: white; padding: 25px 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        h2 { color: #2c3e50; margin-top: 0; }
-        label { font-weight: 600; color: #495057; display: block; margin-top: 15px; margin-bottom: 5px; }
-        input[type="text"], input[type="file"] { width: 100%; padding: 8px 12px; box-sizing: border-box; border: 1px solid #ced4da; border-radius: 4px; font-size: 14px; }
-        .radio-group { margin-top: 5px; }
-        .radio-group label { display: inline; font-weight: normal; margin-right: 15px; }
-        .btn-submit { margin-top: 20px; padding: 10px 20px; background-color: #28a745; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 15px; }
-        .btn-submit:hover { background-color: #218838; }
-        .btn-back { display: inline-block; margin-top: 15px; color: #6c757d; text-decoration: none; }
-        .btn-back:hover { text-decoration: underline; }
-        .preview-box { margin-top: 10px; margin-bottom: 10px; }
-        .preview-box img { border: 1px solid #ced4da; border-radius: 6px; object-fit: cover; }
+        .form-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 14px;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 30px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+        .form-control, .form-select {
+            background-color: #0f172a;
+            border: 1px solid #334155;
+            color: #f8fafc;
+            padding: 10px 14px;
+            border-radius: 8px;
+        }
+        .form-control:focus, .form-select:focus {
+            background-color: #0f172a;
+            border-color: #ef4444;
+            color: #ffffff;
+            box-shadow: 0 0 0 0.25rem rgba(239, 68, 68, 0.2);
+        }
+        .form-label {
+            color: #cbd5e1;
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 6px;
+        }
+        .img-preview {
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid #334155;
+        }
     </style>
 </head>
 <body>
 
-<div class="form-container">
-    <h2>CẬP NHẬT CATEGORY</h2>
-
-    <form action="<c:url value="/admin/category/update"/>" method="post" enctype="multipart/form-data">
-        <input type="hidden" name="categoryid" value="${cate.categoryid}">
-
-        <label for="categoryname">Category name:</label>
-        <input type="text" id="categoryname" name="categoryname" value="${cate.categoryname}" required><br>
-
-        <label for="images">Link images:</label>
-        <input type="text" id="images" name="images" value="${cate.images}"><br>
-
-        <label>Ảnh hiện tại:</label>
-        <div class="preview-box">
-            <c:choose>
-                <c:when test="${cate.images != null && fn:startsWith(cate.images, 'http')}">
-                    <c:set var="imgUrl" value="${cate.images}" />
-                </c:when>
-                <c:otherwise>
-                    <c:url value="/image?fname=${cate.images}" var="imgUrl" />
-                </c:otherwise>
-            </c:choose>
-            <img height="150" width="200" src="${imgUrl}" alt="${cate.categoryname}"
-                 onerror="this.onerror=null; this.src='https://placehold.co/200x150?text=No+Image';" />
+<div class="container py-4">
+    <div class="form-card">
+        <div class="d-flex align-items-center justify-content-between mb-4 pb-2 border-bottom border-secondary">
+            <div>
+                <h4 class="fw-bold text-white mb-1">
+                    <i class="fa-solid fa-pen-to-square text-warning me-2"></i>Cập Nhật Danh Mục
+                </h4>
+                <p class="text-secondary small mb-0">Chỉnh sửa thông tin danh mục ID #${cate.categoryid}</p>
+            </div>
+            <a href="<c:url value='/admin/categories'/>" class="btn btn-outline-secondary btn-sm">
+                <i class="fa-solid fa-arrow-left me-1"></i>Quay lại
+            </a>
         </div>
 
-        <label for="images1">Upload ảnh mới (nếu muốn thay đổi):</label>
-        <input type="file" id="images1" name="images1"><br>
+        <c:if test="${not empty alert}">
+            <div class="alert alert-danger py-2 px-3 small d-flex align-items-center mb-3">
+                <i class="fa-solid fa-triangle-exclamation me-2 fs-5"></i>
+                <div>${alert}</div>
+            </div>
+        </c:if>
 
-        <label>Status:</label>
-        <div class="radio-group">
-            <input type="radio" id="ston" name="status" value="1" ${cate.status == 1 ? 'checked' : ''}>
-            <label for="ston">Hoạt động</label>
-            <input type="radio" id="stoff" name="status" value="0" ${cate.status != 1 ? 'checked' : ''}>
-            <label for="stoff">Khóa</label>
-        </div>
+        <form action="<c:url value='/admin/category/update'/>" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+            <!-- ID ẩn -->
+            <input type="hidden" name="categoryid" value="${cate.categoryid}">
 
-        <br>
-        <input type="submit" class="btn-submit" value="Update">
-    </form>
-    <br>
-    <a class="btn-back" href="<c:url value='/admin/categories'/>">&larr; Quay lại danh sách Category</a>
+            <!-- Tên Danh Mục Validation -->
+            <div class="mb-3">
+                <label class="form-label">Tên Danh Mục <span class="text-danger">*</span></label>
+                <input type="text" name="categoryname" class="form-control ${not empty errorName ? 'is-invalid' : ''}" 
+                       value="${cate.categoryname}" minlength="2" maxlength="100" required autofocus>
+                <c:if test="${not empty errorName}">
+                    <div class="invalid-feedback d-block">
+                        <i class="fa-solid fa-circle-exclamation me-1"></i>${errorName}
+                    </div>
+                </c:if>
+                <div class="invalid-feedback">
+                    Vui lòng nhập tên danh mục (từ 2 đến 100 ký tự).
+                </div>
+            </div>
+
+            <!-- Xem trước hình ảnh hiện tại -->
+            <div class="mb-3">
+                <label class="form-label d-block">Hình Ảnh Hiện Tại</label>
+                <c:choose>
+                    <c:when test="${cate.images != null && fn:startsWith(cate.images, 'http')}">
+                        <c:set var="curImg" value="${cate.images}" />
+                    </c:when>
+                    <c:otherwise>
+                        <c:url value="/image?fname=${cate.images}" var="curImg" />
+                    </c:otherwise>
+                </c:choose>
+                <img class="img-preview mb-2" height="70" width="100" src="${curImg}" alt="${cate.categoryname}"
+                     onerror="this.onerror=null; this.src='https://placehold.co/100x70?text=No+Img';" />
+                <input type="hidden" name="images" value="${cate.images}">
+            </div>
+
+            <!-- Tải ảnh mới thay thế -->
+            <div class="mb-3">
+                <label class="form-label">Chọn File Ảnh Mới Thay Thế</label>
+                <input type="file" name="images1" class="form-control ${not empty errorImage ? 'is-invalid' : ''}" 
+                       accept="image/png, image/jpeg, image/jpg, image/webp, image/gif">
+                <c:if test="${not empty errorImage}">
+                    <div class="invalid-feedback d-block">
+                        <i class="fa-solid fa-circle-exclamation me-1"></i>${errorImage}
+                    </div>
+                </c:if>
+                <small class="text-secondary" style="font-size: 11px;">Để trống nếu muốn giữ nguyên ảnh hiện tại</small>
+            </div>
+
+            <!-- Trạng Thái -->
+            <div class="mb-4">
+                <label class="form-label">Trạng Thái Hoạt Động</label>
+                <select name="status" class="form-select">
+                    <option value="1" ${cate.status == 1 ? 'selected' : ''}>Hoạt động (Hiển thị cho người dùng)</option>
+                    <option value="0" ${cate.status == 0 ? 'selected' : ''}>Khóa / Tạm ẩn</option>
+                </select>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2 pt-2 border-top border-secondary">
+                <a href="<c:url value='/admin/categories'/>" class="btn btn-secondary px-4">Hủy</a>
+                <button type="submit" class="btn btn-danger px-4 fw-semibold">
+                    <i class="fa-solid fa-floppy-disk me-1"></i>Lưu Thay Đổi
+                </button>
+            </div>
+        </form>
+    </div>
 </div>
 
 </body>
 </html>
-

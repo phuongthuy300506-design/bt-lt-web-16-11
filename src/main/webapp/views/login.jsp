@@ -6,20 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Đăng Nhập - Hệ Thống Video HCMUTE</title>
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        body {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            padding: 20px;
-        }
         .login-card {
             background: #ffffff;
             border-radius: 16px;
@@ -27,6 +14,7 @@
             width: 100%;
             max-width: 440px;
             padding: 35px 30px;
+            margin: 40px auto;
         }
         .login-title {
             color: #0f172a;
@@ -66,34 +54,54 @@
     <h2 class="login-title">Đăng Nhập Tài Khoản</h2>
 
     <c:if test="${not empty alert}">
-        <div class="alert alert-danger py-2 px-3 small d-flex align-items-center" role="alert">
+        <div class="alert alert-danger py-2 px-3 small d-flex align-items-center mb-3" role="alert">
             <i class="fa-solid fa-triangle-exclamation me-2 fs-5"></i>
             <div>${alert}</div>
         </div>
     </c:if>
 
     <c:if test="${not empty success_msg}">
-        <div class="alert alert-success py-2 px-3 small d-flex align-items-center" role="alert">
+        <div class="alert alert-success py-2 px-3 small d-flex align-items-center mb-3" role="alert">
             <i class="fa-solid fa-circle-check me-2 fs-5"></i>
             <div>${success_msg}</div>
         </div>
     </c:if>
 
-    <form action="${pageContext.request.contextPath}/login" method="post">
+    <form action="${pageContext.request.contextPath}/login" method="post" class="needs-validation" novalidate>
+        <!-- Username Input với Validation -->
         <div class="mb-3">
-            <label class="form-label fw-semibold text-secondary">Tên đăng nhập hoặc Email</label>
+            <label class="form-label fw-semibold text-secondary">Tên đăng nhập hoặc Email <span class="text-danger">*</span></label>
             <div class="input-group">
                 <span class="input-group-text bg-light"><i class="fa-solid fa-user text-muted"></i></span>
-                <input type="text" name="username" class="form-control" placeholder="Nhập username hoặc email" 
-                       value="${not empty remember_username ? remember_username : username}" required autofocus>
+                <input type="text" name="username" class="form-control ${not empty errorUsername ? 'is-invalid' : ''}" 
+                       placeholder="Nhập username hoặc email" 
+                       value="${not empty remember_username ? remember_username : username}" minlength="3" required autofocus>
+                <c:if test="${not empty errorUsername}">
+                    <div class="invalid-feedback d-block text-start">
+                        <i class="fa-solid fa-circle-exclamation me-1"></i>${errorUsername}
+                    </div>
+                </c:if>
+                <div class="invalid-feedback text-start">
+                    Vui lòng nhập tên đăng nhập hoặc email (tối thiểu 3 ký tự).
+                </div>
             </div>
         </div>
 
+        <!-- Password Input với Validation -->
         <div class="mb-3">
-            <label class="form-label fw-semibold text-secondary">Mật khẩu</label>
+            <label class="form-label fw-semibold text-secondary">Mật khẩu <span class="text-danger">*</span></label>
             <div class="input-group">
                 <span class="input-group-text bg-light"><i class="fa-solid fa-lock text-muted"></i></span>
-                <input type="password" name="password" class="form-control" placeholder="Nhập mật khẩu" required>
+                <input type="password" name="password" class="form-control ${not empty errorPassword ? 'is-invalid' : ''}" 
+                       placeholder="Nhập mật khẩu" minlength="6" required>
+                <c:if test="${not empty errorPassword}">
+                    <div class="invalid-feedback d-block text-start">
+                        <i class="fa-solid fa-circle-exclamation me-1"></i>${errorPassword}
+                    </div>
+                </c:if>
+                <div class="invalid-feedback text-start">
+                    Vui lòng nhập mật khẩu (tối thiểu 6 ký tự).
+                </div>
             </div>
         </div>
 
@@ -122,6 +130,5 @@
     </form>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

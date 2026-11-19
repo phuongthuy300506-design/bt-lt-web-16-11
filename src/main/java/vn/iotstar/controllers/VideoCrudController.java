@@ -22,6 +22,7 @@ import vn.iotstar.services.impl.CategoryServiceImpl;
 import vn.iotstar.services.impl.UserServiceImpl;
 import vn.iotstar.services.impl.VideoServiceImpl;
 import vn.iotstar.util.Constant;
+import vn.iotstar.util.FormValidator;
 
 @MultipartConfig(
     fileSizeThreshold = 1024 * 1024 * 2, // 2MB
@@ -48,9 +49,6 @@ public class VideoCrudController extends HttpServlet {
     private final ICategoryService categoryService = new CategoryServiceImpl();
     private final IUserService userService = new UserServiceImpl();
 
-    /**
-     * Phương thức trích xuất tên file upload theo Slide 9 tài liệu Multipart
-     */
     private String getFileName(Part part) {
         if (part == null) {
             return Constant.DEFAULT_FILENAME;
@@ -75,18 +73,15 @@ public class VideoCrudController extends HttpServlet {
         String uri = req.getRequestURI();
 
         if (uri.contains("/admin/videos")) {
-            // Danh sách Video trong trang Quản trị Admin
             List<Video> listVideos = videoService.findAll();
             req.setAttribute("listVideos", listVideos);
             req.getRequestDispatcher("/views/admin/video-list.jsp").forward(req, resp);
         } else if (uri.contains("/video/add") || uri.contains("/admin/video/add")) {
-            // Trang Thêm mới Video
             List<Category> categories = categoryService.findAll();
             req.setAttribute("categories", categories);
             req.setAttribute("isAdmin", uri.contains("/admin/"));
             req.getRequestDispatcher("/views/admin/video-add.jsp").forward(req, resp);
         } else if (uri.contains("/video/edit") || uri.contains("/admin/video/edit")) {
-            // Trang Chỉnh sửa Video
             String id = req.getParameter("id");
             Video video = videoService.findById(id);
             if (video != null) {
@@ -99,20 +94,17 @@ public class VideoCrudController extends HttpServlet {
                 resp.sendRedirect(req.getContextPath() + (uri.contains("/admin/") ? "/admin/videos" : "/video"));
             }
         } else if (uri.contains("/video/delete") || uri.contains("/admin/video/delete")) {
-            // Xóa Video
             String id = req.getParameter("id");
-            try {
-                videoService.delete(id);
-            } catch (Exception e) {
-                e.printStackTrace();
+            if (id != null) {
+                try {
+                    videoService.delete(id);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
-            if (uri.contains("/admin/")) {
-                resp.sendRedirect(req.getContextPath() + "/admin/videos");
-            } else {
-                resp.sendRedirect(req.getContextPath() + "/video");
-            }
+            resp.sendRedirect(req.getContextPath() + (uri.contains("/admin/") ? "/admin/videos" : "/video"));
         } else {
-            resp.sendRedirect(req.getContextPath() + "/video");
+            resp.sendRedirect(req.getContextPath() + "/home");
         }
     }
 
@@ -122,142 +114,200 @@ public class VideoCrudController extends HttpServlet {
         resp.setCharacterEncoding("UTF-8");
 
         String uri = req.getRequestURI();
-        HttpSession session = req.getSession();
-        User currentUser = (User) session.getAttribute(Constant.SESSION_ACCOUNT);
+        boolean isAdmin = uri.contains("/admin/");
 
-        // Chuẩn bị thư mục lưu trữ Upload
-        String uploadPath = Constant.UPLOAD_DIRECTORY;
-        File uploadDir = new File(uploadPath);
-        if (!uploadDir.exists()) {
-            uploadDir.mkdirs();
-        }
-
-        if (uri.contains("/insert")) {
-            // --- THÊM MỚI VIDEO ---
+        if (uri.contains("/video/insert") || uri.contains("/admin/video/insert")) {
             String videoId = req.getParameter("videoId");
-            if (videoId == null || videoId.trim().isEmpty()) {
-                videoId = "v" + System.currentTimeMillis() % 100000;
-            } else {
-                videoId = videoId.trim();
-            }
-
             String title = req.getParameter("title");
             String description = req.getParameter("description");
-            String videoUrl = req.getParameter("videoUrl");
-            int active = "1".equals(req.getParameter("active")) ? 1 : 0;
-            int categoryId = 1;
+            String categoryIdStr = req.getParameter("categoryId");
+            String activeStr = req.getParameter("active");
+            int active = "1".equals(activeStr) ? 1 : 0;
+
+            boolean hasError = false;
+
+            // Triển khai Server-side Form Validation cho Thêm Video (Yêu cầu 2)
+            if (FormValidator.isNullOrBlank(videoId)) {
+                req.setAttribute("errorVideoId", "Mã video không được để trống!");
+                hasError = true;
+            } else if (!FormValidator.isValidVideoId(videoId)) {
+                req.setAttribute("errorVideoId", "Mã video phải từ 2 đến 50 ký tự!");
+                hasError = true;
+            } else if (videoService.findById(videoId.trim()) != null) {
+                req.setAttribute("errorVideoId", "Mã video '" + videoId.trim() + "' đã tồn tại!");
+                hasError = true;
+            }
+
+            if (FormValidator.isNullOrBlank(title)) {
+                req.setAttribute("errorTitle", "Tiêu đề video không được để trống!");
+                hasError = true;
+            } else if (!FormValidator.isValidVideoTitle(title)) {
+                req.setAttribute("errorTitle", "Tiêu đề video phải có tối thiểu 3 ký tự!");
+                hasError = true;
+            }
+
+            int categoryId = 0;
             try {
-                categoryId = Integer.parseInt(req.getParameter("categoryId"));
-            } catch (Exception ignored) {}
+                categoryId = Integer.parseInt(categoryIdStr);
+            } catch (Exception e) {
+                req.setAttribute("errorCategory", "Vui lòng chọn danh mục hợp lệ!");
+                hasError = true;
+            }
+
+            Part posterPart = null;
+            try {
+                posterPart = req.getPart("poster");
+            } catch (Exception ignored) {
+            }
+
+            if (posterPart != null && posterPart.getSize() > 0 && !FormValidator.isImageFile(posterPart)) {
+                req.setAttribute("errorPoster", "File poster phải là định dạng hình ảnh (.jpg, .jpeg, .png, .webp, .gif)!");
+                hasError = true;
+            }
+
+            if (hasError) {
+                req.setAttribute("videoId", videoId);
+                req.setAttribute("title", title);
+                req.setAttribute("description", description);
+                req.setAttribute("categoryId", categoryId);
+                req.setAttribute("active", active);
+                req.setAttribute("categories", categoryService.findAll());
+                req.setAttribute("isAdmin", isAdmin);
+                req.setAttribute("alert", "Thông tin video không hợp lệ. Vui lòng kiểm tra lại các trường báo lỗi!");
+                req.getRequestDispatcher("/views/admin/video-add.jsp").forward(req, resp);
+                return;
+            }
+
+            videoId = videoId.trim();
+            title = title.trim();
 
             Video video = new Video();
             video.setVideoId(videoId);
-            video.setTitle(title != null ? title.trim() : "Video " + videoId);
-            video.setDescription(description);
+            video.setTitle(title);
+            video.setDescription(description != null ? description.trim() : "");
             video.setActive(active);
             video.setViews(0);
 
-            // Gán danh mục Category
             Category category = categoryService.findById(categoryId);
             video.setCategory(category);
 
-            // Gán người tạo (User - Yêu cầu 4: mối quan hệ 1 - n)
-            if (currentUser != null) {
-                video.setUser(currentUser);
+            // Gán User đăng video
+            HttpSession session = req.getSession();
+            User sessionUser = (User) session.getAttribute(Constant.SESSION_ACCOUNT);
+            if (sessionUser != null) {
+                video.setUser(sessionUser);
             } else {
-                List<User> users = userService.findAll();
-                if (!users.isEmpty()) {
-                    video.setUser(users.get(0));
+                User defaultUser = userService.findById(1);
+                if (defaultUser == null) {
+                    List<User> allUsers = userService.findAll();
+                    defaultUser = !allUsers.isEmpty() ? allUsers.get(0) : null;
                 }
+                video.setUser(defaultUser);
             }
 
-            // Xử lý Upload Poster bằng Multipart
-            Part posterPart = req.getPart("posterFile");
-            if (posterPart != null && posterPart.getSize() > 0) {
-                String originalName = getFileName(posterPart);
-                String ext = originalName.contains(".") ? originalName.substring(originalName.lastIndexOf(".")) : ".png";
-                String posterName = "poster_" + System.currentTimeMillis() + ext;
-                posterPart.write(uploadPath + File.separator + posterName);
-                video.setPoster(posterName);
-            } else {
-                String existingPoster = req.getParameter("posterText");
-                video.setPoster(existingPoster != null && !existingPoster.trim().isEmpty() ? existingPoster.trim() : "poster1.png");
-            }
+            // Xử lý upload file Poster
+            String uploadPath = Constant.DIR;
+            File uploadDir = new File(uploadPath);
+            if (!uploadDir.exists()) uploadDir.mkdirs();
 
-            // Xử lý Upload file Video bằng Multipart nếu có
-            Part videoPart = req.getPart("videoFile");
-            if (videoPart != null && videoPart.getSize() > 0) {
-                String originalVideoName = getFileName(videoPart);
-                String ext = originalVideoName.contains(".") ? originalVideoName.substring(originalVideoName.lastIndexOf(".")) : ".mp4";
-                String videoFileName = "video_" + System.currentTimeMillis() + ext;
-                videoPart.write(uploadPath + File.separator + videoFileName);
-                video.setVideoUrl(req.getContextPath() + "/image?fname=" + videoFileName);
-            } else if (videoUrl != null && !videoUrl.trim().isEmpty()) {
-                video.setVideoUrl(videoUrl.trim());
+            if (posterPart != null && posterPart.getSize() > 0 && posterPart.getSubmittedFileName() != null) {
+                String submittedName = Paths.get(posterPart.getSubmittedFileName()).getFileName().toString();
+                if (!submittedName.trim().isEmpty()) {
+                    String ext = submittedName.contains(".") ? submittedName.substring(submittedName.lastIndexOf(".")) : ".png";
+                    String posterFileName = "poster_" + System.currentTimeMillis() + ext;
+                    posterPart.write(uploadPath + File.separator + posterFileName);
+                    video.setPoster(posterFileName);
+                } else {
+                    video.setPoster("poster1.png");
+                }
             } else {
-                // Link video MP4 mẫu trực quan
-                video.setVideoUrl("https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4");
+                video.setPoster("poster1.png");
             }
 
             videoService.insert(video);
+            resp.sendRedirect(req.getContextPath() + (isAdmin ? "/admin/videos" : "/video"));
 
-            if (uri.contains("/admin/")) {
-                resp.sendRedirect(req.getContextPath() + "/admin/videos");
-            } else {
-                resp.sendRedirect(req.getContextPath() + "/video");
+        } else if (uri.contains("/video/update") || uri.contains("/admin/video/update")) {
+            String videoId = req.getParameter("videoId");
+            String title = req.getParameter("title");
+            String description = req.getParameter("description");
+            String categoryIdStr = req.getParameter("categoryId");
+            String activeStr = req.getParameter("active");
+            int active = "1".equals(activeStr) ? 1 : 0;
+
+            Video video = videoService.findById(videoId);
+            if (video == null) {
+                resp.sendRedirect(req.getContextPath() + (isAdmin ? "/admin/videos" : "/video"));
+                return;
             }
 
-        } else if (uri.contains("/update")) {
-            // --- CẬP NHẬT VIDEO ---
-            String videoId = req.getParameter("videoId");
-            Video video = videoService.findById(videoId);
-            if (video != null) {
-                String title = req.getParameter("title");
-                String description = req.getParameter("description");
-                String videoUrl = req.getParameter("videoUrl");
-                int active = "1".equals(req.getParameter("active")) ? 1 : 0;
-                int categoryId = 1;
-                try {
-                    categoryId = Integer.parseInt(req.getParameter("categoryId"));
-                } catch (Exception ignored) {}
+            boolean hasError = false;
 
-                video.setTitle(title != null ? title.trim() : video.getTitle());
+            // Triển khai Server-side Form Validation cho Sửa Video (Yêu cầu 2)
+            if (FormValidator.isNullOrBlank(title)) {
+                req.setAttribute("errorTitle", "Tiêu đề video không được để trống!");
+                hasError = true;
+            } else if (!FormValidator.isValidVideoTitle(title)) {
+                req.setAttribute("errorTitle", "Tiêu đề video phải có tối thiểu 3 ký tự!");
+                hasError = true;
+            }
+
+            int categoryId = 0;
+            try {
+                categoryId = Integer.parseInt(categoryIdStr);
+            } catch (Exception e) {
+                req.setAttribute("errorCategory", "Vui lòng chọn danh mục hợp lệ!");
+                hasError = true;
+            }
+
+            Part posterPart = null;
+            try {
+                posterPart = req.getPart("poster");
+            } catch (Exception ignored) {
+            }
+
+            if (posterPart != null && posterPart.getSize() > 0 && !FormValidator.isImageFile(posterPart)) {
+                req.setAttribute("errorPoster", "File poster phải là định dạng hình ảnh (.jpg, .jpeg, .png, .webp, .gif)!");
+                hasError = true;
+            }
+
+            if (hasError) {
+                video.setTitle(title);
                 video.setDescription(description);
                 video.setActive(active);
+                req.setAttribute("video", video);
+                req.setAttribute("categories", categoryService.findAll());
+                req.setAttribute("isAdmin", isAdmin);
+                req.setAttribute("alert", "Dữ liệu chỉnh sửa không hợp lệ. Vui lòng kiểm tra lại các trường báo lỗi!");
+                req.getRequestDispatcher("/views/admin/video-edit.jsp").forward(req, resp);
+                return;
+            }
 
-                Category category = categoryService.findById(categoryId);
+            video.setTitle(title.trim());
+            video.setDescription(description != null ? description.trim() : "");
+            video.setActive(active);
+
+            Category category = categoryService.findById(categoryId);
+            if (category != null) {
                 video.setCategory(category);
-
-                // Xử lý Upload Poster mới nếu người dùng chọn
-                Part posterPart = req.getPart("posterFile");
-                if (posterPart != null && posterPart.getSize() > 0) {
-                    String originalName = getFileName(posterPart);
-                    String ext = originalName.contains(".") ? originalName.substring(originalName.lastIndexOf(".")) : ".png";
-                    String posterName = "poster_" + System.currentTimeMillis() + ext;
-                    posterPart.write(uploadPath + File.separator + posterName);
-                    video.setPoster(posterName);
-                }
-
-                // Xử lý Upload file Video mới nếu có
-                Part videoPart = req.getPart("videoFile");
-                if (videoPart != null && videoPart.getSize() > 0) {
-                    String originalVideoName = getFileName(videoPart);
-                    String ext = originalVideoName.contains(".") ? originalVideoName.substring(originalVideoName.lastIndexOf(".")) : ".mp4";
-                    String videoFileName = "video_" + System.currentTimeMillis() + ext;
-                    videoPart.write(uploadPath + File.separator + videoFileName);
-                    video.setVideoUrl(req.getContextPath() + "/image?fname=" + videoFileName);
-                } else if (videoUrl != null && !videoUrl.trim().isEmpty()) {
-                    video.setVideoUrl(videoUrl.trim());
-                }
-
-                videoService.update(video);
             }
 
-            if (uri.contains("/admin/")) {
-                resp.sendRedirect(req.getContextPath() + "/admin/videos");
-            } else {
-                resp.sendRedirect(req.getContextPath() + "/video");
+            String uploadPath = Constant.DIR;
+            File uploadDir = new File(uploadPath);
+            if (!uploadDir.exists()) uploadDir.mkdirs();
+
+            if (posterPart != null && posterPart.getSize() > 0 && posterPart.getSubmittedFileName() != null) {
+                String submittedName = Paths.get(posterPart.getSubmittedFileName()).getFileName().toString();
+                if (!submittedName.trim().isEmpty()) {
+                    String ext = submittedName.contains(".") ? submittedName.substring(submittedName.lastIndexOf(".")) : ".png";
+                    String posterFileName = "poster_" + System.currentTimeMillis() + ext;
+                    posterPart.write(uploadPath + File.separator + posterFileName);
+                    video.setPoster(posterFileName);
+                }
             }
+
+            videoService.update(video);
+            resp.sendRedirect(req.getContextPath() + (isAdmin ? "/admin/videos" : "/video"));
         }
     }
 }

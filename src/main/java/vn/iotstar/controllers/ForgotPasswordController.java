@@ -9,7 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import vn.iotstar.entity.User;
 import vn.iotstar.services.IUserService;
 import vn.iotstar.services.impl.UserServiceImpl;
-import vn.iotstar.util.EmailUtil;
+import vn.iotstar.util.FormValidator;
 
 @WebServlet(urlPatterns = "/forgot-password")
 public class ForgotPasswordController extends HttpServlet {
@@ -29,20 +29,33 @@ public class ForgotPasswordController extends HttpServlet {
         resp.setCharacterEncoding("UTF-8");
 
         String email = req.getParameter("email");
-        if (email == null || email.trim().isEmpty()) {
-            req.setAttribute("alert", "Vui lòng nhập địa chỉ email đã đăng ký!");
+
+        // Triển khai Server-side Form Validation (Yêu cầu 2)
+        if (FormValidator.isNullOrBlank(email)) {
+            req.setAttribute("errorEmail", "Vui lòng nhập địa chỉ email đã đăng ký!");
+            req.setAttribute("alert", "Vui lòng nhập địa chỉ email để nhận mã OTP!");
             req.getRequestDispatcher("/views/forgot-password.jsp").forward(req, resp);
             return;
         }
 
         email = email.trim();
+        if (!FormValidator.isValidEmail(email)) {
+            req.setAttribute("errorEmail", "Địa chỉ email không đúng định dạng (Ví dụ: name@example.com)!");
+            req.setAttribute("email", email);
+            req.setAttribute("alert", "Địa chỉ email không hợp lệ!");
+            req.getRequestDispatcher("/views/forgot-password.jsp").forward(req, resp);
+            return;
+        }
+
         User user = userService.findByEmail(email);
         if (user == null) {
             user = userService.findByUsername(email);
         }
 
         if (user == null) {
-            req.setAttribute("alert", "Không tìm thấy tài khoản tương ứng với thông tin '" + email + "'!");
+            req.setAttribute("errorEmail", "Không tìm thấy tài khoản tương ứng với email '" + email + "'!");
+            req.setAttribute("email", email);
+            req.setAttribute("alert", "Tài khoản không tồn tại trong hệ thống!");
             req.getRequestDispatcher("/views/forgot-password.jsp").forward(req, resp);
             return;
         }
@@ -54,6 +67,7 @@ public class ForgotPasswordController extends HttpServlet {
             resp.sendRedirect(req.getContextPath() + "/reset-password?email=" + user.getEmail());
         } else {
             req.setAttribute("alert", "Không thể gửi mã xác nhận OTP. Vui lòng thử lại sau!");
+            req.setAttribute("email", email);
             req.getRequestDispatcher("/views/forgot-password.jsp").forward(req, resp);
         }
     }
