@@ -4,8 +4,9 @@
     <!-- Bước 3: Cấu hình SiteMesh 3 - Bài tập 03 (ThS. Nguyễn Hữu Trung) -->
     <!-- Phân chia giao diện cho người dùng và admin                     -->
     <!-- ============================================================== -->
-    <mapping path="/*" name="web" decorator="web.jsp" />
     <mapping path="/admin/*" name="admin" decorator="admin.jsp" />
+    <mapping path="/views/admin/*" name="admin" decorator="admin.jsp" />
+    <mapping path="/*" name="web" decorator="web.jsp" />
 
     <!-- Exclude path from decoration. -->
     <mapping path="/api*" exclude="true" />
