@@ -39,6 +39,11 @@
     </div>
     <ul class="nav flex-column px-2">
         <li class="nav-item mb-1">
+            <a class="nav-link text-white-50 px-2 py-1 small" href="${pageContext.request.contextPath}/profile">
+                <i class="fa-solid fa-id-card me-2 text-warning"></i>Hồ Sơ Cá Nhân
+            </a>
+        </li>
+        <li class="nav-item mb-1">
             <a class="nav-link text-white-50 px-2 py-1 small" href="${pageContext.request.contextPath}/home">
                 <i class="fa-solid fa-house me-2"></i>Trang Chủ Website
             </a>

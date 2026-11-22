@@ -69,7 +69,17 @@
                                     data-bs-toggle="dropdown" 
                                     aria-expanded="false"
                                     onclick="toggleUserDropdown(event)">
-                                <i class="fa-solid fa-circle-user fs-5 text-info me-2"></i>
+                                <c:choose>
+                                    <c:when test="${not empty sessionScope.account.avatar && sessionScope.account.avatar.startsWith('http')}">
+                                        <img src="${sessionScope.account.avatar}" class="rounded-circle me-2" style="width: 22px; height: 22px; object-fit: cover;" alt="Avatar">
+                                    </c:when>
+                                    <c:when test="${not empty sessionScope.account.avatar}">
+                                        <img src="${pageContext.request.contextPath}/image?fname=${sessionScope.account.avatar}" class="rounded-circle me-2" style="width: 22px; height: 22px; object-fit: cover;" onerror="this.src='${pageContext.request.contextPath}/uploads/user.png'" alt="Avatar">
+                                    </c:when>
+                                    <c:otherwise>
+                                        <i class="fa-solid fa-circle-user fs-5 text-info me-2"></i>
+                                    </c:otherwise>
+                                </c:choose>
                                 <span>${sessionScope.account.fullName != null ? sessionScope.account.fullName : sessionScope.account.username}</span>
                                 <c:if test="${sessionScope.account.roleid == 1}">
                                     <span class="badge bg-danger ms-2" style="font-size: 10px;">Admin</span>
@@ -78,10 +88,15 @@
                             <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark shadow py-2" 
                                 id="userDropdownMenu"
                                 aria-labelledby="userDropdownBtn"
-                                style="min-width: 220px; z-index: 99999;">
+                                style="min-width: 230px; z-index: 99999;">
                                 <li class="px-3 py-2 border-bottom border-secondary mb-1">
                                     <div class="fw-bold text-white">${sessionScope.account.fullName != null ? sessionScope.account.fullName : sessionScope.account.username}</div>
                                     <small class="text-secondary">@${sessionScope.account.username}</small>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item py-2" href="${pageContext.request.contextPath}/profile">
+                                        <i class="fa-solid fa-id-card me-2 text-warning"></i>Hồ sơ cá nhân
+                                    </a>
                                 </li>
                                 <li>
                                     <a class="dropdown-item py-2" href="${pageContext.request.contextPath}/video">

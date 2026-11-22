@@ -129,6 +129,32 @@ Xây dựng bộ kiểm tra dữ liệu đầu vào [FormValidator.java](src/mai
 
 ---
 
+### YÊU CẦU 3: Xây dựng chức năng Profile của User (Cloudinary & OTP Xác Nhận Email)
+*(Hoàn thành trước 12g30 ngày 23/11/2026)*
+
+1. **Cập nhật thông tin Fullname & Phone:**
+   - Xem và chỉnh sửa thông tin cá nhân tại đường dẫn `/profile`.
+   - Kiểm tra tính hợp lệ của dữ liệu đầu vào (Form Validation) bằng Bootstrap 5.
+
+2. **Upload ảnh lên Cloudinary bằng Multipart:**
+   - Tích hợp thư viện `cloudinary-http44:1.36.0` trong `pom.xml`.
+   - Tiện ích `CloudinaryUtil.java` tiếp nhận `Part` multipart từ form, tải ảnh đại diện lên kho lưu trữ đám mây Cloudinary và nhận về URL ảnh bảo mật `https://res.cloudinary.com/...`.
+   - Xem trước ảnh đại diện (live preview) ngay khi chọn file trên trình duyệt.
+
+3. **Cập nhật Email mới & Xác thực OTP qua Email mới:**
+   - Nếu người dùng nhập email mới khác email hiện tại:
+     - Hệ thống kiểm tra định dạng và chống trùng lặp email trong CSDL.
+     - Sinh mã OTP 6 số ngẫu nhiên và **gửi mã OTP đến địa chỉ email mới**.
+     - Chuyển hướng sang giao diện xác thực `/profile/verify-otp`.
+     - Tự động điền mã OTP trên giao diện để thuận tiện kiểm thử trực tiếp.
+     - Sau khi người dùng xác nhận đúng mã OTP, hệ thống mới chính thức cập nhật email mới vào CSDL và cập nhật phiên làm việc (`HttpSession`).
+
+4. **Quản lý giao diện bằng Sitemesh 3:**
+   - Các trang `/profile` và `/profile/verify-otp` đều được bao bọc tự động bởi Decorator `web.jsp` của SiteMesh 3.
+   - Bổ sung liên kết "Hồ sơ cá nhân" và hiển thị avatar tròn trên cả thanh Topbar người dùng và Header/Sidebar của trang Quản trị Admin.
+
+---
+
 ### LỊCH SỬ COMMIT QUÁ TRÌNH LÀM BÀI TRÊN GITHUB
 - `ad729b5`: *fix*
 - `b96aeb5`: *Bo sung info.jsp va taglib.jsp tai goc webapp dong bo 100% theo slide*

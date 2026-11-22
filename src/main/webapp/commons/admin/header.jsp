@@ -7,10 +7,23 @@
         <span>HCMUTE <span class="text-danger">ADMIN</span></span>
     </a>
     <div class="navbar-nav flex-row ms-auto me-3 align-items-center">
-        <span class="text-secondary small me-3 d-none d-md-inline">
-            <i class="fa-solid fa-circle-user text-warning me-1"></i>
-            Xin chào, <strong>${sessionScope.account != null ? sessionScope.account.username : 'Admin'}</strong>
-        </span>
+        <a class="text-decoration-none text-light small me-3 d-flex align-items-center" href="${pageContext.request.contextPath}/profile" title="Xem hồ sơ cá nhân">
+            <c:choose>
+                <c:when test="${not empty sessionScope.account.avatar && sessionScope.account.avatar.startsWith('http')}">
+                    <img src="${sessionScope.account.avatar}" class="rounded-circle me-1" style="width: 22px; height: 22px; object-fit: cover;" alt="Avatar">
+                </c:when>
+                <c:when test="${not empty sessionScope.account.avatar}">
+                    <img src="${pageContext.request.contextPath}/image?fname=${sessionScope.account.avatar}" class="rounded-circle me-1" style="width: 22px; height: 22px; object-fit: cover;" onerror="this.src='${pageContext.request.contextPath}/uploads/user.png'" alt="Avatar">
+                </c:when>
+                <c:otherwise>
+                    <i class="fa-solid fa-circle-user text-warning me-1"></i>
+                </c:otherwise>
+            </c:choose>
+            <span>Xin chào, <strong>${sessionScope.account != null ? (sessionScope.account.fullName != null ? sessionScope.account.fullName : sessionScope.account.username) : 'Admin'}</strong></span>
+        </a>
+        <a class="btn btn-warning btn-sm me-2 fw-semibold text-dark" href="${pageContext.request.contextPath}/profile">
+            <i class="fa-solid fa-id-card me-1"></i>Hồ Sơ Cá Nhân
+        </a>
         <a class="btn btn-outline-info btn-sm me-2" href="${pageContext.request.contextPath}/home" target="_blank">
             <i class="fa-solid fa-arrow-up-right-from-square me-1"></i>Xem Website
         </a>

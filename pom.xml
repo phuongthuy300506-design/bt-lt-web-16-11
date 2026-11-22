@@ -116,6 +116,13 @@
             <artifactId>sitemesh-webfilter</artifactId>
             <version>3.3.0</version>
         </dependency>
+
+        <!-- Cloudinary Java SDK for Uploading Images (Bài tập 03 - Yêu cầu 3) -->
+        <dependency>
+            <groupId>com.cloudinary</groupId>
+            <artifactId>cloudinary-http44</artifactId>
+            <version>1.36.0</version>
+        </dependency>
     </dependencies>
 
     <build>
